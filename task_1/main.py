@@ -6,45 +6,67 @@ top-K самых часто повторяющихся буквенных N-гр
 и встроенные операции над строками. Предусмотреть обработку знаков препинания."""
 from collections import defaultdict
 from numpy import median, mean
+import os
+import string
 
 
-def word_occurs_in_text() -> None:
-    with open("file.txt") as f:
-        text_in_words = list()
-        for line in f:
-            text_in_words += [el for el in line.lower().split() if el not in ("—", "", " ")]
-            statistics = defaultdict(int)
-            for word in text_in_words:
-                statistics[word] += 1
-            statistics = dict(sorted(statistics.items(), reverse=True, key=lambda x: x[1]))
-        for key, value in statistics.items():
-            print(f"Слово \"{key}\" встречается {value} раз")
+def find_info_about_word_occurs_in_text() -> None:
+    with open("input.txt") as f:
+        if os.path.getsize("input.txt"):
+            text_in_words = list()
+            for line in f:
+                for el in line.lower().split():
+                    if el not in (("—", "") + tuple(string.whitespace)) and len(el) > 1:
+                        if el[-3:-1] == "...":
+                            el = el[:-3]
+                        elif el[-1] in tuple(string.punctuation) + ("?!", "!?"):
+                            el = el[:-1]
+                        elif el[1] in tuple(string.punctuation) + ("?!", "!?"):
+                            el = el[1:]
+                    text_in_words.append(el)
+                statistics = defaultdict(int)
+                for word in text_in_words:
+                    statistics[word] += 1
+                statistics = dict(sorted(statistics.items(), reverse=True, key=lambda x: x[1]))
+            with open("output.txt", "w") as file:
+                for key, value in statistics.items():
+                    file.write(f"Слово \"{key}\" встречается {value} раз\n")
+
+        else:
+            print("Файл пустой!")
 
 
-def words_in_sentence() -> None:
-    with open("file.txt") as f:
-        text = str()
-        for line in f:
-            if line not in ("—", "", " ", "\n", "\r", "."):
-                text += line
-        for el in ("?", "!", "...", "?!", "!?"):
-            text = text.replace(el, ".")
-        sentences = text.split(".")
-        print("Медианное количество слов в предложении: ", median([len(sentence.split()) for sentence in sentences]))
-        print("Среднее количество слов в предложении: ", mean([len(sentence.split()) for sentence in sentences]))
+def find_info_about_words_in_sentence() -> None:
+    with open("input.txt") as f:
+        if os.path.getsize("input.txt"):
+            text = str()
+            for line in f:
+                if line not in (("—", "", ".") + tuple(string.whitespace)):
+                    text += line
+            for el in ("!", "?", "...", "?!", "!?"):
+                text = text.replace(el, ".")
+            sentences = text.split(".")
+            print("Медианное количество слов в предложении: ",
+                  median([len(sentence.split()) for sentence in sentences]))
+            print("Среднее количество слов в предложении: ", mean([len(sentence.split()) for sentence in sentences]))
+        else:
+            print("Файл пустой!")
 
 
 def find_ngrams(K=10, N=4) -> None:
-    with open("file.txt") as f:
-        text = str()
-        for line in f:
-            text += line
+    with open("input.txt") as f:
+        if os.path.getsize("input.txt"):
+            text = str()
+            for line in f:
+                text += line
+        else:
+            print("Файл пустой!")
 
 
 if __name__ == "__main__":
     while True:
         choice = None
-        options = {"1": word_occurs_in_text, "2": words_in_sentence, "3": find_ngrams}
+        options = {"1": find_info_about_word_occurs_in_text, "2": find_info_about_words_in_sentence, "3": find_ngrams}
         while choice not in options.keys():
             choice = input("Тыкните, что хотите посмотреть в этом тексте:\n"
                            "1. Статистика по словам в тексте\n"
