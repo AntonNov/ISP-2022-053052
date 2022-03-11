@@ -39,36 +39,19 @@ def find_ngrams(K=10, N=4) -> None:
         text = str()
         for line in f:
             text += line
-        """tuple_text = self.text.translate(self.text.maketrans('', '', string.punctuation)).replace(' ', '')
-        if n >= len(tuple_text) or n <= 0:
-            return "\nОшибка ввода. Неверное значение N."
-        i = 0
-        n_grams = []
-        while n <= len(tuple_text):
-            n_grams.append(tuple_text[i:n])
-            n = n + 1
-            i = i + 1
-        n_grams = dict((word, n_grams.count(word)) for word in set(n_grams) if n_grams.count(word) >= 1)
-        sorted_tuple = sorted(n_grams.items(), key=lambda x: x[1])
-        if k >= len(sorted_tuple) or k <= 0:
-            return "\nОшибка ввода. Неверное значение K."
-        result = "Заданный k-топ n-грам:"
-        for i in range(len(sorted_tuple) - 1, len(sorted_tuple) - k - 1, -1):
-            result = result + f"\n{sorted_tuple[i]}"
-        return result"""""
 
 
 if __name__ == "__main__":
     while True:
-        choice = ""
-        while not "1" <= choice <= "3":
+        choice = None
+        options = {"1": word_occurs_in_text, "2": words_in_sentence, "3": find_ngrams}
+        while choice not in options.keys():
             choice = input("Тыкните, что хотите посмотреть в этом тексте:\n"
                            "1. Статистика по словам в тексте\n"
                            "2. Статистика по словам в предложении\n"
                            "3. Поиск N-грам\n"
                            )
-        what_to_do = {"1": word_occurs_in_text, "2": words_in_sentence, "3": find_ngrams}
-        what_to_do[choice]()
+        options[choice]()
         is_final = None
         while is_final not in ("y", "n"):
             is_final = input("Уходите? y/n\n")
