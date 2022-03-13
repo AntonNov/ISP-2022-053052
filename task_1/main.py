@@ -7,31 +7,32 @@ top-K самых часто повторяющихся буквенных N-гр
 from collections import defaultdict
 from numpy import median, mean
 import os
-import string
+from string import whitespace, punctuation
 
 
 def find_info_about_word_occurs_in_text() -> None:
-    with open("input.txt") as f:
+    with open("input.txt") as file:
         if os.path.getsize("input.txt"):
             text_in_words = list()
-            for line in f:
+            for line in file:
                 for el in line.lower().split():
-                    if el not in (("—", "") + tuple(string.whitespace)) and len(el) > 1:
-                        if el[-3:-1] == "...":
-                            el = el[:-3]
-                        elif el[-1] in tuple(string.punctuation) + ("?!", "!?"):
-                            el = el[:-1]
-                        elif el[1] in tuple(string.punctuation) + ("?!", "!?"):
-                            el = el[1:]
-                    text_in_words.append(el)
-                statistics = defaultdict(int)
-                for word in text_in_words:
-                    statistics[word] += 1
-                statistics = dict(sorted(statistics.items(), reverse=True, key=lambda x: x[1]))
-            with open("output.txt", "w") as file:
+                    # предлоги, союзы и т.д.
+                    if len(el) > 1:
+                        for punct_mark in (("...", "«", "»", "[⇨]") + tuple(punctuation)):
+                            if punct_mark in el:
+                                if punct_mark == el[-len(punct_mark):]:
+                                    el = el[:-len(punct_mark)]
+                                else:
+                                    el = el[len(punct_mark):]
+                    if el != "—":
+                        text_in_words.append(el)
+            statistics = defaultdict(int)
+            for word in text_in_words:
+                statistics[word] += 1
+            statistics = dict(sorted(statistics.items(), reverse=True, key=lambda x: x[1]))
+            with open("output.txt", "w") as file2:
                 for key, value in statistics.items():
-                    file.write(f"Слово \"{key}\" встречается {value} раз\n")
-
+                    file2.write(f"Слово \"{key}\" встречается {value} раз\n")
         else:
             print("Файл пустой!")
 
@@ -41,9 +42,9 @@ def find_info_about_words_in_sentence() -> None:
         if os.path.getsize("input.txt"):
             text = str()
             for line in f:
-                if line not in (("—", "", ".") + tuple(string.whitespace)):
+                if line not in ("—." + whitespace):
                     text += line
-            for el in ("!", "?", "...", "?!", "!?"):
+            for el in ("!", "?", "...", "?!", "!?", "!!", "!!!"):
                 text = text.replace(el, ".")
             sentences = text.split(".")
             print("Медианное количество слов в предложении: ",
@@ -53,7 +54,7 @@ def find_info_about_words_in_sentence() -> None:
             print("Файл пустой!")
 
 
-def find_ngrams(K=10, N=4) -> None:
+def find_ngrams(k=10, n=4) -> None:
     with open("input.txt") as f:
         if os.path.getsize("input.txt"):
             text = str()
