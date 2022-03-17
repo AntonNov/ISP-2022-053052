@@ -118,7 +118,7 @@ def find_ngrams(k=10, n=4) -> None:
                     return "\nОшибка ввода. Неверное значение K."
                 file2.write("Заданный k-топ n-грам:")
                 for i in range(len(sorted_tuple) - 1, len(sorted_tuple) - k - 1, -1):
-                    file2.write(f"\n({sorted_tuple[i]})")
+                    file2.write(f"\nНграмы \"{sorted_tuple[i][0]}\" встречается {sorted_tuple[i][1]} раз")
         else:
             print("Файл пустой!")
 
