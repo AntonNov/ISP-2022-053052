@@ -16,18 +16,18 @@ STATISTICS = defaultdict(int)
 
 
 def find_info_about_word_occurs_in_text() -> None:
+    """
+    Обрабатываем результата парсинга по пробельным символам:
+    если строка содержит различные знаки препинания,
+    то мы присваиваем исходной строке строку без знаков
+    препинания.
+    """
     with open("input.txt") as file:
         if path.getsize("input.txt"):
             text_in_words = list()
             for line in file:
                 for word in line.strip().lower().split():
                     # print(f"Было \"{word}\"")
-                    """
-                    Обрабатываем результат парсинга по пробельным символам:
-                    если строка содержит различные знаки препинания,
-                    то мы их присваиваем исходной строке строку без знаков
-                    препинания
-                    """
                     for punct_mark in "[⇨]", "...«»" + string.punctuation:
                         if word.count(punct_mark) == 1:
                             if punct_mark == word[-len(punct_mark):]:
@@ -58,6 +58,11 @@ def find_info_about_word_occurs_in_text() -> None:
 
 
 def find_info_about_words_in_sentence() -> None:
+    """
+    Находим знаки препинания, заменяем их на точку.
+    Парсим по точке. Для анализа предложения парсим предложение
+    по пробелу.
+    """
     with open("input.txt") as f:
         if path.getsize("input.txt"):
             text = str()
@@ -85,43 +90,55 @@ def find_info_about_words_in_sentence() -> None:
 
 
 def find_ngrams(k=10, n=4) -> None:
-    CHOICE = None
+    choice = None
     global STATISTICS
-    while CHOICE not in ("y", "n"):
-        CHOICE = input("Вы хотите использовать значения по умолчанию?(y/n)")
-    if CHOICE == "n":
-        k, n = map(int, input("Введите k, n")).split()
+    while choice not in ("y", "n"):
+        choice = input("Вы хотите использовать значения по умолчанию?(y/n)\n")
+    if choice == "n":
+        k, n = map(int, input("Введите k, n через пробел: ").split())
+        if (k, n) == (0, 0):
+            return "Неудачные значения. До свидания"
     with open("input.txt") as f:
         if path.getsize("input.txt"):
             text = str()
             for line in f:
-                text += line.strip()
+                text += line.lower().strip()
             with open("output.txt", "w") as file2:
-                for el in [
-                    list(STATISTICS.keys()[i])
-                    for i in range(k) in list(STATISTICS.keys())
-                ]:
-                    file2.write(el)
+                tuple_text = text.translate(text.maketrans('', '', string.punctuation)).replace(' ', '')
+                if n >= len(tuple_text) or n <= 0:
+                    return "\nОшибка ввода. Неверное значение N."
+                i = 0
+                n_grams = []
+                while n <= len(tuple_text):
+                    n_grams.append(tuple_text[i:n])
+                    n, i = n + 1, i + 1
+                n_grams = dict((word, n_grams.count(word)) for word in set(n_grams) if n_grams.count(word) >= 1)
+                sorted_tuple = sorted(n_grams.items(), key=lambda x: x[1])
+                if k >= len(sorted_tuple) or k <= 0:
+                    return "\nОшибка ввода. Неверное значение K."
+                file2.write("Заданный k-топ n-грам:")
+                for i in range(len(sorted_tuple) - 1, len(sorted_tuple) - k - 1, -1):
+                    file2.write(f"\n({sorted_tuple[i]})")
         else:
             print("Файл пустой!")
 
 
 if __name__ == "__main__":
     while True:
-        choice = None
+        CHOICE = None
         options = {
             "1": find_info_about_word_occurs_in_text,
             "2": find_info_about_words_in_sentence,
             "3": find_ngrams,
         }
-        while choice not in options.keys():
-            choice = input(
+        while CHOICE not in options.keys():
+            CHOICE = input(
                 "Тыкните, что хотите посмотреть в этом тексте:\n"
                 "1. Статистика по словам в тексте\n"
                 "2. Статистика по словам в предложении1\n"
                 "3. Поиск N-грам\n"
             )
-        options[choice]()
+        options[CHOICE]()
         IS_FINAL = None
         while IS_FINAL not in ("y", "n"):
             IS_FINAL = input("Уходите? y/n\n")
