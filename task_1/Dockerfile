@@ -1,9 +1,11 @@
-FROM python:3.10-alpine
+FROM python:3.9-slim-bullseye
 
-RUN mkdir -p /usr/src/app/
+RUN python3 -m venv .venv
 
-WORKDIR /usr/src/app/
+# Install dependencies:
+COPY requirements.txt .
+RUN . .venv/bin/activate && pip install -r requirements.txt
 
-COPY . /usr/src/app/
-
-CMD ["python", "main.py"]
+# Run the application:
+COPY main.py .
+CMD . .venv/bin/activate && exec python main.py
