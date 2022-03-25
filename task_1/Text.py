@@ -13,7 +13,6 @@ class Text:
 
         self.k, self.n = 10, 4
         self.input_path = input_path
-        self.output_path = output_path
         self.file_for_reading = open(input_path)
         self.file_for_writing = open(output_path, "w")
 
@@ -55,11 +54,11 @@ class Text:
         for line in self.file_for_reading:
             text += line.strip()
         for el in (
-            "!",
-            "?",
-            "...",
-            "?!",
-            "!?",
+                "!",
+                "?",
+                "...",
+                "?!",
+                "!?",
         ):
             text = re.sub(f"{el}+", ".", text)
         sentences = text.split(".")
@@ -94,24 +93,24 @@ class Text:
                 print("Ошибка ввода. Неверное значение n.\n")
                 return
 
-            i = 0
-            n_grams = list()
-            while self.n <= len(tuple_text):
-                n_grams.append(tuple_text[i : self.n])
-                self.n, i = self.n + 1, i + 1
-            n_grams = dict(
-                (word, n_grams.count(word))
-                for word in set(n_grams)
-                if n_grams.count(word) >= 1
+        i = 0
+        ngrams = list()
+        while self.n <= len(tuple_text):
+            ngrams.append(tuple_text[i: self.n])
+            self.n, i = self.n + 1, i + 1
+        ngrams = dict(
+            (word, ngrams.count(word))
+            for word in set(ngrams)
+            if ngrams.count(word) >= 1
+        )
+
+        sorted_tuple = sorted(ngrams.items(), key=lambda x: x[1])
+        if self.k >= len(sorted_tuple) or self.k <= 0:
+            print("Ошибка ввода. Неверное значение N.\n")
+            return
+
+        self.file_for_writing.write("Заданный k-топ n-грам:\n")
+        for i in range(len(sorted_tuple) - 1, len(sorted_tuple) - self.k - 1, -1):
+            self.file_for_writing.write(
+                f'Нграмы "{sorted_tuple[i][0]}" встречается {sorted_tuple[i][1]} раз\n'
             )
-
-            sorted_tuple = sorted(n_grams.items(), key=lambda x: x[1])
-            if self.k >= len(sorted_tuple) or self.k <= 0:
-                print("Ошибка ввода. Неверное значение N.\n")
-                return
-
-            self.file_for_writing.write("Заданный k-топ n-грам:\n")
-            for i in range(len(sorted_tuple) - 1, len(sorted_tuple) - self.k - 1, -1):
-                self.file_for_writing.write(
-                    f'Нграмы "{sorted_tuple[i][0]}" встречается {sorted_tuple[i][1]} раз\n'
-                )
