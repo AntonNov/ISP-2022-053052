@@ -12,13 +12,13 @@ class Text:
             exit()
 
         self.k, self.n = 10, 4
-        self.file = open("input.txt")
-        self.file2 = open("output.txt", "w")
+        self.file_for_reading = open("input.txt")
+        self.file_for_writing = open("output.txt", "w")
 
     def __del__(self):
         if path.getsize("input.txt"):
-            self.file.close()
-            self.file2.close()
+            self.file_for_reading.close()
+            self.file_for_writing.close()
 
     def find_info_about_word_occurs_in_text(self) -> None:
         """
@@ -28,7 +28,7 @@ class Text:
         препинания.
         """
         text_in_words = list()
-        for line in self.file:
+        for line in self.file_for_reading:
             for word in line.strip().lower().split():
                 for punct_mark in "[⇨]", "...«»" + string.punctuation:
                     if word.count(punct_mark) == 1:
@@ -50,7 +50,7 @@ class Text:
         statistics = dict(sorted(statistics.items(), reverse=True, key=lambda x: x[1]))
 
         for key, value in statistics.items():
-            self.file2.write(f'Слово "{key}" встречается {value} раз\n')
+            self.file_for_writing.write(f'Слово "{key}" встречается {value} раз\n')
 
     def find_info_about_words_in_sentence(self) -> None:
         """
@@ -59,7 +59,7 @@ class Text:
         предложения парсит предложение по пробелу.
         """
         text = str()
-        for line in self.file:
+        for line in self.file_for_reading:
             text += line.strip()
         for el in (
                 "!",
@@ -92,7 +92,7 @@ class Text:
                 return
 
         text = str()
-        for line in self.file:
+        for line in self.file_for_reading:
             text += line.lower().strip()
             tuple_text = text.translate(
                 text.maketrans("", "", string.punctuation)
@@ -117,8 +117,8 @@ class Text:
                 print("Ошибка ввода. Неверное значение N.\n")
                 return
 
-            self.file2.write("Заданный k-топ n-грам:\n")
+            self.file_for_writing.write("Заданный k-топ n-грам:\n")
             for i in range(len(sorted_tuple) - 1, len(sorted_tuple) - self.k - 1, -1):
-                self.file2.write(
+                self.file_for_writing.write(
                     f'Нграмы "{sorted_tuple[i][0]}" встречается {sorted_tuple[i][1]} раз\n'
                 )
