@@ -1,7 +1,8 @@
 from Text import Text
 
 if __name__ == "__main__":
-    text = Text()
+    text = Text("input.txt", "output.txt")
+
     while True:
         CHOICE = None
         options = {
@@ -16,6 +17,7 @@ if __name__ == "__main__":
                 "2. Статистика по словам в предложении\n"
                 "3. Поиск N-грам\n"
             )
+
         options[CHOICE]()
         IS_FINAL = None
         while IS_FINAL not in ("y", "n"):

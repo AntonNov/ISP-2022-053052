@@ -6,17 +6,19 @@ from numpy import median, mean
 
 
 class Text:
-    def __init__(self):
-        if not path.getsize("input.txt"):
+    def __init__(self, input_path, output_path):
+        if not path.getsize(input_path):
             print("Файл пустой!\n")
             exit()
 
         self.k, self.n = 10, 4
-        self.file_for_reading = open("input.txt")
-        self.file_for_writing = open("output.txt", "w")
+        self.input_path = input_path
+        self.output_path = output_path
+        self.file_for_reading = open(input_path)
+        self.file_for_writing = open(output_path, "w")
 
     def __del__(self):
-        if path.getsize("input.txt"):
+        if path.getsize(self.input_path):
             self.file_for_reading.close()
             self.file_for_writing.close()
 
@@ -30,17 +32,8 @@ class Text:
         text_in_words = list()
         for line in self.file_for_reading:
             for word in line.strip().lower().split():
-                for punct_mark in "[⇨]", "...«»" + string.punctuation:
-                    if word.count(punct_mark) == 1:
-                        if punct_mark == word[: len(punct_mark)]:
-                            word = word[len(punct_mark):]
-                        elif punct_mark == word[-len(punct_mark):]:
-                            word = word[: -len(punct_mark)]
-                    elif (
-                            word.count(punct_mark) == 2
-                            and word[: len(punct_mark)] == word[-len(punct_mark):]
-                    ):
-                        word = word[len(punct_mark): -len(punct_mark)]
+                for punct_mark in "..." + string.punctuation:
+                    word = word.replace(punct_mark, "")
                 if word != "—":
                     text_in_words.append(word)
 
@@ -54,21 +47,21 @@ class Text:
 
     def find_info_about_words_in_sentence(self) -> None:
         """
-        Находит знаки препинания, заменяем их на точку.
-        Парсит по точке для получения предложений. Для анализа
+        Находит знаки препинания, заменяет их на точку.
+        Для получения предложений парсит по точке. Для анализа
         предложения парсит предложение по пробелу.
         """
         text = str()
         for line in self.file_for_reading:
             text += line.strip()
         for el in (
-                "!",
-                "?",
-                "...",
-                "?!",
-                "!?",
+            "!",
+            "?",
+            "...",
+            "?!",
+            "!?",
         ):
-            re.sub(f"{el}+", ".", text)
+            text = re.sub(f"{el}+", ".", text)
         sentences = text.split(".")
 
         print(
@@ -98,13 +91,13 @@ class Text:
                 text.maketrans("", "", string.punctuation)
             ).replace(" ", "")
             if self.n >= len(tuple_text) or self.n <= 0:
-                print("Ошибка ввода. Неверное значение N.\n")
+                print("Ошибка ввода. Неверное значение n.\n")
                 return
 
             i = 0
             n_grams = list()
             while self.n <= len(tuple_text):
-                n_grams.append(tuple_text[i: self.n])
+                n_grams.append(tuple_text[i : self.n])
                 self.n, i = self.n + 1, i + 1
             n_grams = dict(
                 (word, n_grams.count(word))
