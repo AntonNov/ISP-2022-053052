@@ -6,20 +6,24 @@ from numpy import median, mean
 
 
 class Text:
+    """
+    Класс для обработки текста
+    """
+
     def __init__(self, input_path, output_path):
         if not path.getsize(input_path):
             print("Файл пустой!\n")
-            exit()
+            return
 
-        self.k, self.n = 10, 4
-        self.input_path = input_path
-        self.file_for_reading = open(input_path)
-        self.file_for_writing = open(output_path, "w")
+        self.__k, self.__n = 10, 4
+        self.__input_path = input_path
+        self.__file_for_reading = open(input_path)
+        self.__file_for_writing = open(output_path, "w")
 
     def __del__(self):
-        if path.getsize(self.input_path):
-            self.file_for_reading.close()
-            self.file_for_writing.close()
+        if path.getsize(self.__input_path):
+            self.__file_for_reading.close()
+            self.__file_for_writing.close()
 
     def find_info_about_word_occurs_in_text(self) -> None:
         """
@@ -29,10 +33,11 @@ class Text:
         препинания.
         """
         text_in_words = list()
-        for line in self.file_for_reading:
+        for line in self.__file_for_reading:
             for word in line.strip().lower().split():
                 for punct_mark in "..." + string.punctuation:
-                    word = word.replace(punct_mark, "")
+                    if punct_mark in word:
+                        word = word.replace(punct_mark, "")
                 if word != "—":
                     text_in_words.append(word)
 
@@ -41,8 +46,8 @@ class Text:
             statistics[word] += 1
         statistics = dict(sorted(statistics.items(), reverse=True, key=lambda x: x[1]))
 
-        for key, value in statistics.items():
-            self.file_for_writing.write(f'Слово "{key}" встречается {value} раз\n')
+        for word, count in statistics.items():
+            self.__file_for_writing.write(f'Слово "{word}" встречается {count} раз\n')
 
     def find_info_about_words_in_sentence(self) -> None:
         """
@@ -51,7 +56,7 @@ class Text:
         предложения парсит предложение по пробелу.
         """
         text = str()
-        for line in self.file_for_reading:
+        for line in self.__file_for_reading:
             text += line.strip()
         for el in (
                 "!",
@@ -78,26 +83,26 @@ class Text:
         while choice not in ("y", "n"):
             choice = input("Вы хотите использовать значения по умолчанию?(y/n)\n")
         if choice == "n":
-            self.k, self.n = map(int, input("Введите k, n через пробел: ").split())
-            if (self.k, self.n) == (0, 0):
+            self.__k, self.__n = map(int, input("Введите k, n через пробел: ").split())
+            if (self.__k, self.__n) == (0, 0):
                 print("Неудачные значения. До свидания")
                 return
 
         text = str()
-        for line in self.file_for_reading:
+        for line in self.__file_for_reading:
             text += line.lower().strip()
             tuple_text = text.translate(
                 text.maketrans("", "", string.punctuation)
             ).replace(" ", "")
-            if self.n >= len(tuple_text) or self.n <= 0:
-                print("Ошибка ввода. Неверное значение n.\n")
+            if self.__n >= len(tuple_text) or self.__n <= 0:
+                print("Ошибка ввода. Неверное значение n.")
                 return
 
-        i = 0
+        cnt = 0
         ngrams = list()
-        while self.n <= len(tuple_text):
-            ngrams.append(tuple_text[i: self.n])
-            self.n, i = self.n + 1, i + 1
+        while self.__n <= len(tuple_text):
+            ngrams.append(tuple_text[cnt: self.__n])
+            self.__n, cnt = self.__n + 1, cnt + 1
         ngrams = dict(
             (word, ngrams.count(word))
             for word in set(ngrams)
@@ -105,12 +110,12 @@ class Text:
         )
 
         sorted_tuple = sorted(ngrams.items(), key=lambda x: x[1])
-        if self.k >= len(sorted_tuple) or self.k <= 0:
-            print("Ошибка ввода. Неверное значение N.\n")
+        if self.__k >= len(sorted_tuple) or self.__k <= 0:
+            print("Ошибка ввода. Неверное значение k.")
             return
 
-        self.file_for_writing.write("Заданный k-топ n-грам:\n")
-        for i in range(len(sorted_tuple) - 1, len(sorted_tuple) - self.k - 1, -1):
-            self.file_for_writing.write(
-                f'Нграмы "{sorted_tuple[i][0]}" встречается {sorted_tuple[i][1]} раз\n'
-            )
+        self.__file_for_writing.write("Заданный k-топ нграм:\n")
+        for index, el in enumerate(sorted_tuple[::-1]):
+            if index == self.__k:
+                break
+            self.__file_for_writing.write(f'Нграмы "{el[0]}" встречается {el[1]} раз\n')
