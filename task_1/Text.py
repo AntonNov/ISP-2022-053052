@@ -25,6 +25,10 @@ class Text:
             self.__file_for_reading.close()
             self.__file_for_writing.close()
 
+    def __remove_cursor(self) -> None:
+        self.__file_for_reading.seek(0)
+        self.__file_for_writing.seek(0)
+
     def find_info_about_word_occurs_in_text(self) -> None:
         """
         Обрабатывает результата парсинга по пробельным символам:
@@ -37,7 +41,10 @@ class Text:
             for word in line.strip().lower().split():
                 for punct_mark in "..." + string.punctuation:
                     if punct_mark in word:
-                        word = word.replace(punct_mark, "")
+                        if punct_mark != "-" and word.index(punct_mark) not in range(
+                                2, len(word) - 3
+                        ):
+                            word = word.replace(punct_mark, "")
                 if word != "—":
                     text_in_words.append(word)
 
@@ -48,6 +55,7 @@ class Text:
 
         for word, count in statistics.items():
             self.__file_for_writing.write(f'Слово "{word}" встречается {count} раз\n')
+        self.__remove_cursor()
 
     def find_info_about_words_in_sentence(self) -> None:
         """
@@ -65,9 +73,8 @@ class Text:
                 "?!",
                 "!?",
         ):
-            text = re.sub(f"{el}+", ".", text)
-        sentences = text.split(".")
-
+            text = re.sub(f"{re.escape(el)}+", ".", text)
+        sentences = text.split(".")[:-1]
         print(
             "Медианное количество слов в предложении: ",
             median([len(sentence.split()) for sentence in sentences]),
@@ -76,9 +83,13 @@ class Text:
             "Среднее количество слов в предложении: ",
             mean([len(sentence.split()) for sentence in sentences]),
         )
+        self.__file_for_reading.seek(0)
 
     def find_ngrams(self) -> None:
         """Ищет нграмы методом срезов"""
+        # очищаем файл для записи
+        f = open("output.txt", "w")
+        f.close()
         choice = None
         while choice not in ("y", "n"):
             choice = input("Вы хотите использовать значения по умолчанию?(y/n)\n")
@@ -119,3 +130,4 @@ class Text:
             if index == self.__k:
                 break
             self.__file_for_writing.write(f'Нграмы "{el[0]}" встречается {el[1]} раз\n')
+        self.__remove_cursor()
