@@ -21,6 +21,6 @@ if __name__ == "__main__":
         options[CHOICE]()
         IS_FINAL = None
         while IS_FINAL not in ("y", "n"):
-            IS_FINAL = input("Уходите? y/n\n")
+            IS_FINAL = input("Уходите? y/n\n").lower()
         if IS_FINAL == "y":
             break

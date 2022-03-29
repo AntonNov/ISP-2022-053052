@@ -12,7 +12,7 @@ class Text:
 
     def __init__(self, input_path, output_path):
         if not path.getsize(input_path):
-            print("Файл пустой!\n")
+            print("Файл пустой!")
             return
 
         self.__k, self.__n = 10, 4
@@ -39,13 +39,8 @@ class Text:
         text_in_words = list()
         for line in self.__file_for_reading:
             for word in line.strip().lower().split():
-                for punct_mark in "..." + string.punctuation:
-                    if punct_mark in word:
-                        if punct_mark != "-" and word.index(punct_mark) not in range(
-                                2, len(word) - 3
-                        ):
-                            word = word.replace(punct_mark, "")
-                if word != "—":
+                word = word.strip("..." + string.punctuation)
+                if word != "":
                     text_in_words.append(word)
 
         statistics = defaultdict(int)
@@ -86,13 +81,17 @@ class Text:
         self.__file_for_reading.seek(0)
 
     def find_ngrams(self) -> None:
-        """Ищет нграмы методом срезов"""
+        """Ищет n-грамы методом срезов"""
+
         # очищаем файл для записи
         f = open("output.txt", "w")
         f.close()
+
         choice = None
         while choice not in ("y", "n"):
-            choice = input("Вы хотите использовать значения по умолчанию?(y/n)\n")
+            choice = input(
+                "Вы хотите использовать значения по умолчанию?(y/n)\n"
+            ).lower()
         if choice == "n":
             self.__k, self.__n = map(int, input("Введите k, n через пробел: ").split())
             if (self.__k, self.__n) == (0, 0):
@@ -100,6 +99,7 @@ class Text:
                 return
 
         text = str()
+        tuple_text = tuple()
         for line in self.__file_for_reading:
             text += line.lower().strip()
             tuple_text = text.translate(
@@ -125,9 +125,12 @@ class Text:
             print("Ошибка ввода. Неверное значение k.")
             return
 
-        self.__file_for_writing.write("Заданный k-топ нграм:\n")
+        self.__file_for_writing.write("Заданный k-топ n-грам:\n")
         for index, el in enumerate(sorted_tuple[::-1]):
             if index == self.__k:
                 break
-            self.__file_for_writing.write(f'Нграмы "{el[0]}" встречается {el[1]} раз\n')
+            self.__file_for_writing.write(
+                f'N-грама "{el[0]}" встречается {el[1]} раз\n'
+            )
         self.__remove_cursor()
+        self.__k, self.__n = 10, 4
