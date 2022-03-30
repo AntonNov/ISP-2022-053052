@@ -40,7 +40,7 @@ class Text:
         for line in self.__file_for_reading:
             for word in line.strip().lower().split():
                 word = word.strip("..." + string.punctuation)
-                if word != "":
+                if word:
                     text_in_words.append(word)
 
         statistics = defaultdict(int)
