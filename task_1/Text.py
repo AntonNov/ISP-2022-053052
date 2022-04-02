@@ -2,7 +2,7 @@ from collections import defaultdict
 from os import path
 from re import escape, sub
 from string import punctuation
-from typing import DefaultDict
+from typing import IO, DefaultDict, Optional
 
 from numpy import mean, median
 
@@ -12,15 +12,16 @@ class Text:
     Класс для обработки текста
     """
 
-    def __init__(self, input_path, output_path):
+    def __init__(self, input_path: str, output_path: str):
         if not path.getsize(input_path):
             print("Файл пустой!")
             return
 
-        self.__k, self.__n = 10, 4
-        self.__input_path = input_path
-        self.__file_for_reading = open(input_path)
-        self.__file_for_writing = open(output_path, "w")
+        self.__k: int = 10
+        self.__n: int = 4
+        self.__input_path: str = input_path
+        self.__file_for_reading: IO = open(input_path)
+        self.__file_for_writing: IO = open(output_path, "w")
 
     def __del__(self):
         if path.getsize(self.__input_path):
@@ -39,7 +40,7 @@ class Text:
         препинания. Статистику получаем при помощи словаря,
         затем выводим в консоль.
         """
-        text_in_words = list()
+        text_in_words: list = list()
         for line in self.__file_for_reading:
             for word in line.strip().lower().split():
                 word = word.strip("..." + punctuation)
@@ -49,7 +50,7 @@ class Text:
         statistics: DefaultDict = defaultdict(int)
         for word in text_in_words:
             statistics[word] += 1
-        new_statistics = dict(
+        new_statistics: dict = dict(
             sorted(statistics.items(), reverse=True, key=lambda x: x[1])
         )
 
@@ -63,7 +64,7 @@ class Text:
         Для получения списка предложений парсит текст по точке.
         Для получения списка слов парсит предложение по пробелу.
         """
-        text = str()
+        text: str = str()
         for line in self.__file_for_reading:
             text += line.strip()
         for el in (
@@ -75,7 +76,7 @@ class Text:
         ):
             text = sub(f"{escape(el)}+", ".", text)
 
-        sentences = text.split(".")[:-1]
+        sentences: list = text.split(".")[:-1]
         print(
             "Медианное количество слов в предложении: ",
             median([len(sentence.split()) for sentence in sentences]),
@@ -90,10 +91,10 @@ class Text:
         """Ищет n-грамы методом срезов"""
 
         # очищаем файл для записи
-        f = open("output.txt", "w")
+        f: IO = open("output.txt", "w")
         f.close()
 
-        choice = None
+        choice: Optional[str] = None
         while choice not in ("y", "n"):
             choice = input(
                 "Вы хотите использовать значения по умолчанию?(y/n)\n"
@@ -104,7 +105,7 @@ class Text:
                 print("Неудачные значения. До свидания")
                 return
 
-        text = str()
+        text: str = str()
         tuple_text: str = str()
         for line in self.__file_for_reading:
             text += line.lower().strip()
@@ -115,19 +116,19 @@ class Text:
                 print("Ошибка ввода. Неверное значение n.")
                 return
 
-        cnt = 0
-        ngrams_list = list()
+        cnt: int = 0
+        ngrams_list: list = list()
         while self.__n <= len(tuple_text):
             ngrams_list.append(tuple_text[cnt: self.__n])
             self.__n, cnt = self.__n + 1, cnt + 1
 
-        ngrams_dict = dict(
+        ngrams_dict: dict = dict(
             (word, ngrams_list.count(word))
             for word in set(ngrams_list)
             if ngrams_list.count(word) >= 1
         )
 
-        sorted_tuple = sorted(ngrams_dict.items(), key=lambda x: x[1])
+        sorted_tuple: list = sorted(ngrams_dict.items(), key=lambda x: x[1])
         if self.__k >= len(sorted_tuple) or self.__k <= 0:
             print("Ошибка ввода. Неверное значение k.")
             return
