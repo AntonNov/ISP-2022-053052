@@ -1,11 +1,13 @@
+from typing import Callable, Dict, Optional
+
 from Text import Text
 
 if __name__ == "__main__":
-    text = Text("input.txt", "output.txt")
+    text: Text = Text("input.txt", "output.txt")
 
     while True:
-        CHOICE = str()
-        options = {
+        CHOICE: str = str()
+        options: Dict[str, Callable[[], None]] = {
             "1": text.find_info_about_word_occurs_in_text,
             "2": text.find_info_about_words_in_sentence,
             "3": text.find_ngrams,
@@ -19,7 +21,7 @@ if __name__ == "__main__":
             )
 
         options[CHOICE]()
-        IS_FINAL = None
+        IS_FINAL: Optional[str] = None
         while IS_FINAL not in ("y", "n"):
             IS_FINAL = input("Уходите? y/n\n").lower()
         if IS_FINAL == "y":
