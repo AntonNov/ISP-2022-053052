@@ -1,8 +1,10 @@
 from collections import defaultdict
 from os import path
-import string
-import re
-from numpy import median, mean
+from re import escape, sub
+from string import punctuation
+from typing import DefaultDict
+
+from numpy import mean, median
 
 
 class Text:
@@ -34,29 +36,32 @@ class Text:
         Обрабатывает результата парсинга по пробельным символам:
         если строка содержит различные знаки препинания,
         то мы присваиваем исходной строке строку без знаков
-        препинания.
+        препинания. Статистику получаем при помощи словаря,
+        затем выводим в консоль.
         """
         text_in_words = list()
         for line in self.__file_for_reading:
             for word in line.strip().lower().split():
-                word = word.strip("..." + string.punctuation)
+                word = word.strip("..." + punctuation)
                 if word:
                     text_in_words.append(word)
 
-        statistics = defaultdict(int)
+        statistics: DefaultDict = defaultdict(int)
         for word in text_in_words:
             statistics[word] += 1
-        statistics = dict(sorted(statistics.items(), reverse=True, key=lambda x: x[1]))
+        new_statistics = dict(
+            sorted(statistics.items(), reverse=True, key=lambda x: x[1])
+        )
 
-        for word, count in statistics.items():
+        for word, count in new_statistics.items():
             self.__file_for_writing.write(f'Слово "{word}" встречается {count} раз\n')
         self.__remove_cursor()
 
     def find_info_about_words_in_sentence(self) -> None:
         """
-        Находит знаки препинания, заменяет их на точку.
-        Для получения предложений парсит по точке. Для анализа
-        предложения парсит предложение по пробелу.
+        Заменяет знаки препинания на точку.
+        Для получения списка предложений парсит текст по точке.
+        Для получения списка слов парсит предложение по пробелу.
         """
         text = str()
         for line in self.__file_for_reading:
@@ -68,7 +73,8 @@ class Text:
                 "?!",
                 "!?",
         ):
-            text = re.sub(f"{re.escape(el)}+", ".", text)
+            text = sub(f"{escape(el)}+", ".", text)
+
         sentences = text.split(".")[:-1]
         print(
             "Медианное количество слов в предложении: ",
@@ -99,28 +105,29 @@ class Text:
                 return
 
         text = str()
-        tuple_text = tuple()
+        tuple_text: str = str()
         for line in self.__file_for_reading:
             text += line.lower().strip()
-            tuple_text = text.translate(
-                text.maketrans("", "", string.punctuation)
-            ).replace(" ", "")
+            tuple_text = text.translate(text.maketrans("", "", punctuation)).replace(
+                " ", ""
+            )
             if self.__n >= len(tuple_text) or self.__n <= 0:
                 print("Ошибка ввода. Неверное значение n.")
                 return
 
         cnt = 0
-        ngrams = list()
+        ngrams_list = list()
         while self.__n <= len(tuple_text):
-            ngrams.append(tuple_text[cnt: self.__n])
+            ngrams_list.append(tuple_text[cnt: self.__n])
             self.__n, cnt = self.__n + 1, cnt + 1
-        ngrams = dict(
-            (word, ngrams.count(word))
-            for word in set(ngrams)
-            if ngrams.count(word) >= 1
+
+        ngrams_dict = dict(
+            (word, ngrams_list.count(word))
+            for word in set(ngrams_list)
+            if ngrams_list.count(word) >= 1
         )
 
-        sorted_tuple = sorted(ngrams.items(), key=lambda x: x[1])
+        sorted_tuple = sorted(ngrams_dict.items(), key=lambda x: x[1])
         if self.__k >= len(sorted_tuple) or self.__k <= 0:
             print("Ошибка ввода. Неверное значение k.")
             return
