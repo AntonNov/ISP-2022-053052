@@ -2,7 +2,7 @@ from collections import defaultdict
 from os import path
 from re import escape, sub
 from string import punctuation
-from typing import IO, DefaultDict, Optional
+from typing import IO, DefaultDict, Dict, Optional
 
 from numpy import mean, median
 
@@ -12,7 +12,7 @@ class Text:
     Класс для обработки текста
     """
 
-    def __init__(self, input_path: str, output_path: str):
+    def __init__(self, input_path: str, output_path: str) -> None:
         if not path.getsize(input_path):
             print("Файл пустой!")
             return
@@ -23,12 +23,15 @@ class Text:
         self.__file_for_reading: IO = open(input_path)
         self.__file_for_writing: IO = open(output_path, "w")
 
-    def __del__(self):
+    def __del__(self) -> None:
         if path.getsize(self.__input_path):
             self.__file_for_reading.close()
             self.__file_for_writing.close()
 
     def __remove_cursor(self) -> None:
+        """
+        Перемещает курсор для чтения и записи в начало файла
+        """
         self.__file_for_reading.seek(0)
         self.__file_for_writing.seek(0)
 
@@ -37,8 +40,9 @@ class Text:
         Обрабатывает результата парсинга по пробельным символам:
         если строка содержит различные знаки препинания,
         то мы присваиваем исходной строке строку без знаков
-        препинания. Статистику получаем при помощи словаря,
-        затем выводим в консоль.
+        препинания. Статистику получаем используя словарь, у
+        которого ключ - слово, а значение - количество повторений
+        слова в тексте. Затем выводим словарь в консоль.
         """
         text_in_words: list = list()
         for line in self.__file_for_reading:
@@ -50,7 +54,7 @@ class Text:
         statistics: DefaultDict = defaultdict(int)
         for word in text_in_words:
             statistics[word] += 1
-        new_statistics: dict = dict(
+        new_statistics: Dict[str, int] = dict(
             sorted(statistics.items(), reverse=True, key=lambda x: x[1])
         )
 
@@ -63,16 +67,18 @@ class Text:
         Заменяет знаки препинания на точку.
         Для получения списка предложений парсит текст по точке.
         Для получения списка слов парсит предложение по пробелу.
+        Затем анализирует список слов и выводит медианное и среднее
+        количество слов в предложении.
         """
         text: str = str()
         for line in self.__file_for_reading:
             text += line.strip()
         for el in (
-                "!",
-                "?",
-                "...",
-                "?!",
-                "!?",
+            "!",
+            "?",
+            "...",
+            "?!",
+            "!?",
         ):
             text = sub(f"{escape(el)}+", ".", text)
 
@@ -119,7 +125,7 @@ class Text:
         cnt: int = 0
         ngrams_list: list = list()
         while self.__n <= len(tuple_text):
-            ngrams_list.append(tuple_text[cnt: self.__n])
+            ngrams_list.append(tuple_text[cnt : self.__n])
             self.__n, cnt = self.__n + 1, cnt + 1
 
         ngrams_dict: dict = dict(
