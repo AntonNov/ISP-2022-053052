@@ -4,7 +4,7 @@ if __name__ == "__main__":
     text = Text("input.txt", "output.txt")
 
     while True:
-        CHOICE = None
+        CHOICE = str()
         options = {
             "1": text.find_info_about_word_occurs_in_text,
             "2": text.find_info_about_words_in_sentence,
