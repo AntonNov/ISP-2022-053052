@@ -1,8 +1,8 @@
-from collections import defaultdict
+import collections
 from os import path
 from re import escape, sub
 from string import punctuation
-from typing import IO, DefaultDict, Dict, Optional
+from typing import IO, Counter, DefaultDict, Dict, List
 
 from numpy import mean, median
 
@@ -35,23 +35,29 @@ class Text:
         self.__file_for_reading.seek(0)
         self.__file_for_writing.seek(0)
 
-    def find_info_about_word_occurs_in_text(self) -> None:
+    def __get_text_in_words(self) -> List[str]:
         """
         Обрабатывает результата парсинга по пробельным символам:
         если строка содержит различные знаки препинания,
         то мы присваиваем исходной строке строку без знаков
-        препинания. Статистику получаем используя словарь, у
-        которого ключ - слово, а значение - количество повторений
-        слова в тексте. Затем выводим словарь в консоль.
+        препинания.
         """
         text_in_words: list = list()
         for line in self.__file_for_reading:
             for word in line.strip().lower().split():
-                word = word.strip("..." + punctuation)
-                if word:
+                if word := word.strip("..." + punctuation):
                     text_in_words.append(word)
+        return text_in_words
 
-        statistics: DefaultDict = defaultdict(int)
+    def find_info_about_word_occurs_in_text(self) -> None:
+        """
+        Статистику получаем используя словарь, у
+        которого ключ - слово, а значение - количество повторений
+        слова в тексте. Затем выводим словарь в консоль.
+        """
+        text_in_words: list = self.__get_text_in_words()
+
+        statistics: DefaultDict = collections.defaultdict(int)
         for word in text_in_words:
             statistics[word] += 1
         new_statistics: Dict[str, int] = dict(
@@ -100,7 +106,7 @@ class Text:
         f: IO = open("output.txt", "w")
         f.close()
 
-        choice: Optional[str] = None
+        choice: str | None = None
         while choice not in ("y", "n"):
             choice = input(
                 "Вы хотите использовать значения по умолчанию?(y/n)\n"
@@ -111,36 +117,27 @@ class Text:
                 print("Неудачные значения. До свидания")
                 return
 
-        text: str = str()
-        tuple_text: str = str()
-        for line in self.__file_for_reading:
-            text += line.lower().strip()
-            tuple_text = text.translate(text.maketrans("", "", punctuation)).replace(
-                " ", ""
-            )
-            if self.__n >= len(tuple_text) or self.__n <= 0:
-                print("Ошибка ввода. Неверное значение n.")
-                return
+        text: str = "".join(self.__get_text_in_words())
+
+        if self.__n >= len(text) or self.__n <= 0:
+            print("Ошибка ввода. Неверное значение n.")
+            return
 
         cnt: int = 0
-        ngrams_list: list = list()
-        while self.__n <= len(tuple_text):
-            ngrams_list.append(tuple_text[cnt : self.__n])
+        ngrams: list = list()
+        while self.__n <= len(text):
+            ngrams.append(text[cnt : self.__n])
             self.__n, cnt = self.__n + 1, cnt + 1
 
-        ngrams_dict: dict = dict(
-            (word, ngrams_list.count(word))
-            for word in set(ngrams_list)
-            if ngrams_list.count(word) >= 1
-        )
+        ngrams_dict: Counter[str] = collections.Counter(ngrams)
 
-        sorted_tuple: list = sorted(ngrams_dict.items(), key=lambda x: x[1])
-        if self.__k >= len(sorted_tuple) or self.__k <= 0:
+        ngrams_list_new: list = sorted(ngrams_dict.items(), key=lambda x: x[1])
+        if self.__k >= len(ngrams_list_new) or self.__k <= 0:
             print("Ошибка ввода. Неверное значение k.")
             return
 
         self.__file_for_writing.write("Заданный k-топ n-грам:\n")
-        for index, el in enumerate(sorted_tuple[::-1]):
+        for index, el in enumerate(ngrams_list_new[::-1]):
             if index == self.__k:
                 break
             self.__file_for_writing.write(
