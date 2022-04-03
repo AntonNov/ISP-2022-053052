@@ -1,17 +1,22 @@
-from typing import Callable, Dict, Optional
+from typing import Callable, Dict
 
 from Text import Text
 
-if __name__ == "__main__":
-    text: Text = Text("input.txt", "output.txt")
+
+def main() -> None:
+    """
+    Функция вызывает основную программу.
+    """
+    text = Text("input.txt", "output.txt")
 
     while True:
-        CHOICE: str = str()
         options: Dict[str, Callable[[], None]] = {
             "1": text.find_info_about_word_occurs_in_text,
             "2": text.find_info_about_words_in_sentence,
             "3": text.find_ngrams,
         }
+        CHOICE: str = str()
+
         while CHOICE not in options.keys():
             CHOICE = input(
                 "Тыкните, что хотите посмотреть в этом тексте:\n"
@@ -19,10 +24,14 @@ if __name__ == "__main__":
                 "2. Статистика по словам в предложении\n"
                 "3. Поиск N-грам\n"
             )
-
         options[CHOICE]()
-        IS_FINAL: Optional[str] = None
+
+        IS_FINAL: str | None = None
         while IS_FINAL not in ("y", "n"):
             IS_FINAL = input("Уходите? y/n\n").lower()
         if IS_FINAL == "y":
             break
+
+
+if __name__ == "__main__":
+    main()
