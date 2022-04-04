@@ -12,7 +12,7 @@ class Text:
     Класс для обработки текста
     """
 
-    def __init__(self, input_path: str, output_path: str) -> None:
+    def __init__(self, input_path: str, output_path: str):
         if not path.getsize(input_path):
             print("Файл пустой!")
             return
@@ -23,14 +23,15 @@ class Text:
         self.__file_for_reading: IO = open(input_path)
         self.__file_for_writing: IO = open(output_path, "w")
 
-    def __del__(self) -> None:
+    def __del__(self):
         if path.getsize(self.__input_path):
             self.__file_for_reading.close()
             self.__file_for_writing.close()
 
     def __remove_cursor(self) -> None:
         """
-        Перемещает курсор для чтения и записи в начало файла
+        Возвращает курсоры файлов input.txt и output.txt
+        в исходное положение,
         """
         self.__file_for_reading.seek(0)
         self.__file_for_writing.seek(0)
@@ -39,8 +40,8 @@ class Text:
         """
         Обрабатывает результата парсинга по пробельным символам:
         если строка содержит различные знаки препинания,
-        то мы присваиваем исходной строке строку без знаков
-        препинания.
+        то присваивает исходной строке строку без знаков
+        препинания. Возвращает список слов.
         """
         text_in_words: list = list()
         for line in self.__file_for_reading:
@@ -51,9 +52,9 @@ class Text:
 
     def find_info_about_word_occurs_in_text(self) -> None:
         """
-        Статистику получаем используя словарь, у
+        Статистику получаем, используя словарь, у
         которого ключ - слово, а значение - количество повторений
-        слова в тексте. Затем выводим словарь в консоль.
+        слова в тексте. Затем выводим статистику в output.txt.
         """
         text_in_words: list = self.__get_text_in_words()
 
@@ -74,7 +75,8 @@ class Text:
         Для получения списка предложений парсит текст по точке.
         Для получения списка слов парсит предложение по пробелу.
         Затем анализирует список слов и выводит медианное и среднее
-        количество слов в предложении.
+        количество слов в предложении в консоль. Возвращает курсор файла
+        output.txt в начало
         """
         text: str = str()
         for line in self.__file_for_reading:
@@ -100,7 +102,10 @@ class Text:
         self.__file_for_reading.seek(0)
 
     def find_ngrams(self) -> None:
-        """Ищет n-грамы методом срезов"""
+        """Ищет n-грамы методом срезов. Для статистики по n-грамам используется
+        словарь Counter из модуля collections. Статистику выводит в файл output.txt.
+        Возвращает дефолтные значения k, n для избежания багов.
+        """
 
         # очищаем файл для записи
         f: IO = open("output.txt", "w")
@@ -113,35 +118,27 @@ class Text:
             ).lower()
         if choice == "n":
             self.__k, self.__n = map(int, input("Введите k, n через пробел: ").split())
-            if (self.__k, self.__n) == (0, 0):
+            if self.__k <= 0 or self.__n <= 0:
                 print("Неудачные значения. До свидания")
                 return
 
-        text: str = "".join(self.__get_text_in_words())
-
-        if self.__n >= len(text) or self.__n <= 0:
+        text_without_whitespaces: str = "".join(self.__get_text_in_words())
+        if self.__n >= len(text_without_whitespaces):
             print("Ошибка ввода. Неверное значение n.")
             return
 
         cnt: int = 0
-        ngrams: list = list()
-        while self.__n <= len(text):
-            ngrams.append(text[cnt : self.__n])
+        ngrams_list: list = list()
+        while self.__n <= len(text_without_whitespaces):
+            ngrams_list.append(text_without_whitespaces[cnt : self.__n])
             self.__n, cnt = self.__n + 1, cnt + 1
 
-        ngrams_dict: Counter[str] = collections.Counter(ngrams)
-
-        ngrams_list_new: list = sorted(ngrams_dict.items(), key=lambda x: x[1])
-        if self.__k >= len(ngrams_list_new) or self.__k <= 0:
-            print("Ошибка ввода. Неверное значение k.")
-            return
-
+        ngrams: Counter[str] = collections.Counter(ngrams_list)
         self.__file_for_writing.write("Заданный k-топ n-грам:\n")
-        for index, el in enumerate(ngrams_list_new[::-1]):
-            if index == self.__k:
-                break
-            self.__file_for_writing.write(
-                f'N-грама "{el[0]}" встречается {el[1]} раз\n'
-            )
+        self.__file_for_writing.writelines(
+            f'N-грама "{word}" встречается {count} раз\n'
+            for word, count in ngrams.most_common(self.__k)
+        )
+
         self.__remove_cursor()
         self.__k, self.__n = 10, 4

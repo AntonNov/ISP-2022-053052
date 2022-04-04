@@ -15,8 +15,8 @@ def main() -> None:
             "2": text.find_info_about_words_in_sentence,
             "3": text.find_ngrams,
         }
-        CHOICE: str = str()
 
+        CHOICE: str = str()
         while CHOICE not in options.keys():
             CHOICE = input(
                 "Тыкните, что хотите посмотреть в этом тексте:\n"
