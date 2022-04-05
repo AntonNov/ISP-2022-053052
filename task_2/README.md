@@ -35,17 +35,28 @@
 [Ликбез по типизации в языках программирования](https://habr.com/ru/post/161205/)
 
 ## 2. Типы данных и их свойства
-
-* int (a = 5)
-* float (a = 5.1)
-* complex (a = 5 + 5j)
-* bool (is_active = True)
-* string (str1 = "Hello word")
-* list (list1 = [1, 2, 3])
-* tuple (tuple1 = 1, 2, 3)
-* set (set1 = {1, 2, 3})  Множество — значения уникальны
-* frozenset — тот же set, но immutable
-* dict (dict1 = {"+": x + y, "-": x - y })
+```python
+# int 
+a = 5
+# float 
+b = 5.1
+# complex 
+c = 5 + 5j
+# bool 
+is_active = True
+# string
+str1 = "Hello word"
+# list 
+list1 = [1, 2, 3]
+# tuple 
+tuple1 = 1, 2, 3
+# set. Множество — значения уникальны
+set1 = {1, 2, 3}
+# frozenset — тот же set, но immutable
+set2 = frozenset(1, 2, 3)
+# dict 
+dict1 = {"+": x + y, "-": x - y}
+```
 
 Immutable (неизменяемые): int, float, complex, bool, string, tuple, frozenset
 
@@ -54,18 +65,23 @@ Mutable (изменяемые): list, set, dict
 Что это значит:
 
 ```python
-a = 5
-print(id(a))
-a += 1  # a = a + 1
-print(id(a))
-# Результаты будут разными, поскольку int immutable
+>>> a = 5
+>>> print(id(a))
+4546988512
+>>> a += 1  # a = a + 1
+>>> print(id(a))
+4546988544
+>>> # Результаты будут разными, поскольку int immutable
+
 ```
 
 ```python
-list1 = [1, 2, 3]
-print(id(list1))
-list1.append(4)
-print(id(list1))
+>>> list1 = [1, 2, 3]
+>>> print(id(list1))
+140274863836672
+>>> list1.append(4)
+>>> print(id(list1))
+140274863836672
 # Результаты будут одинаковыми, поскольку list mutable
 ```
 
@@ -74,7 +90,7 @@ print(id(list1))
 ## 3. Функции и их аргументы
 
 ```python
-def function(a: int, b: int) -> int:
+def func(a: int, b: int) -> int:
     return a + b
 ```
 
@@ -87,7 +103,6 @@ lambda x: x ** 2
 ```
 
 ## 5. Встроенные функции
-
 ```python
 # возвращает объект <class range>, объект-итератор
 range(start, stop, step)
@@ -95,6 +110,8 @@ range(start, stop, step)
 filter(lambda x: x % 2 == 0, numbers)
 #
 zip()
+map()
+sorted()
 print()
 any()
 all()
@@ -103,8 +120,17 @@ min()
 # возвращает наибольшее значение в итерабельной последовательности(в т.ч. генераторе )
 max([1, 2, 3])
 ```
-
 ## 6. Scopes (LEGB), global, nonlocal
+```python
+# замыкание
+def counter(start=0):
+    def step():
+        nonlocal start
+        start += 1
+        return start
+    
+    return step
+```
 
 ## 7. Dict comprehension, List comprehension и Set comprehension
 
@@ -118,6 +144,29 @@ my_set = {int(el) for el in list1}
 ```
 
 ## 8. Декораторы
+```python
+"""Создать декоратор для функции, которая принимает список чисел.
+Декоратор должен производить предварительную проверку данных - удалять все четные элементы из списка."""
+
+from random import randint
+
+
+def my_decorator(func):
+    def the_wrapper(my_list):
+        func([elem for elem in my_list if elem % 2])  # Сама функция
+
+    return the_wrapper  # Вернём эту функцию
+
+
+@my_decorator
+def my_func(my_list):
+    print(my_list)
+
+
+my_list = [randint(-100, 100) for _ in range(20)]
+print(my_list)
+my_func(my_list)
+```
 
 ## 9. Работа с файлами
 
@@ -140,15 +189,20 @@ my_set = {int(el) for el in list1}
 ## 17. Standart class-related decorators
 
 ## 18. __init()__ и __new()__
-
+```python
+```
 ## 19. Class Object
-
+```python
+```
 ## 20. Meta class, Data class, Mixin
-
+```python
+```
 ## 21. __slots__
-
+```python
+```
 ## 22. Исключения и работа с ними
-
+```python
+```
 ## 23. Контекстный менеджер
 
 ## 24. Итераторы, генераторы
@@ -162,10 +216,14 @@ my_set = {int(el) for el in list1}
 ```
 Активировать виртуальное окружение
 pip install virtualenv
-
 virtualenv .venv
-
 source .venv/bin/activate
+
+Деактивировать виртуальное окружение
+deactivate
+
+Создать requirements.txt
+pip freeze > requirements.txt
 ```
 
 ## 26. Профилирование
