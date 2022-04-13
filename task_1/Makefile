@@ -8,7 +8,7 @@ SOURCES := $(shell find . -name '*.py' -not -path '*./.venv/*' -not -path '*./.g
 all: lint
 
 venv: .venv/bin/activate
-.venv/bin/activate: requirements.txt
+.venv/bin/activate: data/requirements.txt
 	@python3 -m venv ./.venv
 
 	# Install the required python packages inside a new virtual environment.

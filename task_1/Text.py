@@ -108,7 +108,7 @@ class Text:
         """
 
         # очищаем файл для записи
-        f: IO = open("output.txt", "w")
+        f: IO = open("data/output.txt", "w")
         f.close()
 
         choice: str | None = None

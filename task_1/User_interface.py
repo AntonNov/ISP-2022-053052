@@ -7,7 +7,7 @@ def main() -> None:
     """
     Функция вызывает основную программу.
     """
-    text = Text("input.txt", "output.txt")
+    text = Text("data/input.txt", "data/output.txt")
 
     while True:
         options: Dict[str, Callable[[], None]] = {
