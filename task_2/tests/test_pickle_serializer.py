@@ -1,9 +1,9 @@
 import pickle
-from task_2.abstract_serializer import AbstractSerializer
+
+from ..factory import Factory
 
 
 class TestPickleSerializer:
     def test_pickle_serializer(self):
-        dict1 = {'a': 1, 'b': 2, 'c': 3}
-        serializer = AbstractSerializer("pickle")
-        assert pickle.dumps(dict1) == serializer.serialize(dict1)
+        dict1 = {"a": 1, "b": 2, "c": 3}
+        assert pickle.dumps(dict1) == Factory.create_serializer("json").dumps(dict1)

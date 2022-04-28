@@ -1,30 +1,33 @@
 import pickle
 from typing import Any
 
-from ..abstract_serializer.abstract_serializer import AbstractSerializer
+from abstract_serializer import AbstractSerializer
 
 
 class PickleSerializer(AbstractSerializer):
-
-    def dump(self, obj, file_path) -> None:
+    @staticmethod
+    def dump(object_to_serialize, file_path) -> None:
         """
         сериализует Python-объект в файл формата pickle
         """
-        pickle.dump(file_path)
+        file_path.write(PickleSerializer.dumps(object_to_serialize))
 
-    def dumps(self, object_to_serialize) -> str:
+    @staticmethod
+    def dumps(object_to_serialize) -> bytes:
         """
         сериализует Python-объект в строку
         """
-        return pickle.dumps(object_to_serialize)
+        return pickle.dumps(object_to_serialize, indent=4)
 
-    def load(self, file_path) -> Any:
+    @staticmethod
+    def load(file_path) -> Any:
         """
         десериализует Python-объект из файла формата pickle
         """
-        return pickle.load(self)
+        return pickle.load(file_path.read())
 
-    def loads(self, string) -> Any:
+    @staticmethod
+    def loads(string) -> Any:
         """
         десериализует Python-объект из строки
         """

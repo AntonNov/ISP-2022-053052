@@ -1,30 +1,33 @@
 from typing import Any
 
-from ..abstract_serializer.abstract_serializer import AbstractSerializer
 import yaml
+from abstract_serializer import AbstractSerializer
 
 
 class YamlSerializer(AbstractSerializer):
-
-    def dump(self, obj, file_path) -> None:
+    @staticmethod
+    def dump(object_to_serialize, file_path) -> None:
         """
         сериализует Python-объект в файл формата yaml
         """
-        yaml.dump(file_path)
+        file_path.write(YamlSerializer.dumps(object_to_serialize))
 
-    def dumps(self, object_to_serialize) -> str:
+    @staticmethod
+    def dumps(object_to_serialize) -> str:
         """
         сериализует Python-объект в строку
         """
-        return yaml.dumps(object_to_serialize)
+        return yaml.dumps(object_to_serialize, indent=4)
 
-    def load(self, file_path) -> Any:
+    @staticmethod
+    def load(file_path) -> Any:
         """
         десериализует Python-объект из файла формата yaml
         """
-        return yaml.load(self)
+        return yaml.load(file_path.read())
 
-    def loads(self, string) -> Any:
+    @staticmethod
+    def loads(string) -> Any:
         """
         десериализует Python-объект из строки
         """
