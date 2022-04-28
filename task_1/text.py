@@ -16,10 +16,10 @@ class Text:
         if not path.getsize(input_path):
             print("Файл пустой!")
             return
+
         self.__k: int = 10
         self.__n: int = 4
         self.__input_path: str = input_path
-        self.__output_path: str = output_path
         self.__file_for_reading: IO = open(input_path)
         self.__file_for_writing: IO = open(output_path, "w")
 
@@ -82,11 +82,11 @@ class Text:
         for line in self.__file_for_reading:
             text += line.strip()
         for el in (
-                "!",
-                "?",
-                "...",
-                "?!",
-                "!?",
+            "!",
+            "?",
+            "...",
+            "?!",
+            "!?",
         ):
             text = sub(f"{escape(el)}+", ".", text)
 
@@ -108,7 +108,7 @@ class Text:
         """
 
         # очищаем файл для записи
-        f: IO = open(self.__output_path, "w")
+        f: IO = open("data/output.txt", "w")
         f.close()
 
         choice: str | None = None
@@ -130,7 +130,7 @@ class Text:
         cnt: int = 0
         ngrams_list: list = list()
         while self.__n <= len(text_without_whitespaces):
-            ngrams_list.append(text_without_whitespaces[cnt: self.__n])
+            ngrams_list.append(text_without_whitespaces[cnt : self.__n])
             self.__n, cnt = self.__n + 1, cnt + 1
 
         ngrams: Counter[str] = collections.Counter(ngrams_list)

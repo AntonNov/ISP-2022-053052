@@ -1,6 +1,6 @@
 from typing import Callable, Dict
 
-from Text import Text
+from text import Text
 
 
 def main() -> None:
