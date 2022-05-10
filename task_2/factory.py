@@ -12,7 +12,7 @@ class Factory:
             "pickle": PickleSerializer,
             "toml": TomlSerializer,
             "yaml": YamlSerializer,
-        }
+        } 
         if data_format in dict_for_choice.keys():
             return dict_for_choice[data_format]()
         else:

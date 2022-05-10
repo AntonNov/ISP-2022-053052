@@ -5,12 +5,12 @@ from abstract_serializer import AbstractSerializer
 
 
 class JsonSerializer(AbstractSerializer):
-    @staticmethod
-    def dump(object_to_serialize, file_path) -> None:
+    @classmethod
+    def dump(cls, object_to_serialize, file_path) -> None:
         """
         сериализует Python-объект в файл формата json
         """
-        file_path.write(JsonSerializer.dumps(object_to_serialize))
+        file_path.write(cls.dumps(object_to_serialize))
 
     @staticmethod
     def dumps(object_to_serialize) -> str:
