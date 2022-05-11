@@ -19,7 +19,7 @@ class YamlSerializer:
         return obj
 
     @staticmethod
-    def dumps(self, obj):
+    def dumps(obj):
         dump_dict = dp(obj)
         return yaml.safe_dump(dump_dict)
 

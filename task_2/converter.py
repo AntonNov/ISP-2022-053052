@@ -1,5 +1,5 @@
 import logging
-from create_serializer import create_serializer_file as c_s
+from create_serializer import create_serializer_file
 
 logging.basicConfig(
     level=logging.WARNING, filename="warning.log", format="%(levelname)s: %(message)s"
@@ -11,20 +11,19 @@ write = "w"
 bwrite = "bw"
 
 
-def string_converter(str, in_lang, out_lang):
-
+def string_converter(_str, in_lang, out_lang):
     if in_lang == out_lang:
-        return s
-    loader = c_s(in_lang)
-    dumper = c_s(out_lang)
-    return dumper.dumps(loader.loads(s))
+        return _str
+    loader = create_serializer_file(in_lang)
+    dumper = create_serializer_file(out_lang)
+    return dumper.dumps(loader.loads(_str))
 
 
 def file_converter(input_path, output_path, in_lang="json", out_lang="json"):
     try:
-        in_ext = input_path.rpartition(".")[2]
-        out_ext = output_path.rpartition(".")[2]
-        loader = c_s(in_lang, input_path)
+        in_ext = input_path.split(".")[-1]
+        out_ext = output_path.split(".")[-1]
+        loader = create_serializer_file(in_lang, input_path)
         if in_ext == "pickle":
             read_m = bread
         else:
@@ -33,7 +32,7 @@ def file_converter(input_path, output_path, in_lang="json", out_lang="json"):
             write_m = bwrite
         else:
             write_m = write
-        dumper = c_s(out_lang, output_path)
+        dumper = create_serializer_file(out_lang, output_path)
         if loader is dumper:
             logging.info("Don't need to convert")
             return
