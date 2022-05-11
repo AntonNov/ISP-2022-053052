@@ -55,7 +55,6 @@ class JsonLoader:
 
     def load_object(self):
         dct = {}
-        ch, i = self.next_key_char()
 
         while True:
             ch, i = self.next_key_char()
